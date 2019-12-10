@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"io/ioutil"
+	"log"
 	"os"
 	"sixteen/utils"
 
@@ -34,13 +35,40 @@ func main() {
 	fmt.Println(result)
 	switch result {
 	case "list":
-		fmt.Println("list")
+		listTasks()
 	case "create":
 		createNew()
 	default:
-		//listLog
 		validate()
 	}
+}
+
+const task_path = "docs/refactoring/"
+
+func listTasks() []string {
+	files, err := ioutil.ReadDir(task_path)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var tasks []string
+	for _, f := range files {
+		task, _ := ParseTask(task_path + f.Name())
+		tasks = append(tasks, task)
+	}
+	return tasks
+}
+
+func ParseTask(filePath string) (string, error) {
+	data, err := ioutil.ReadFile(filePath)
+
+	if err != nil {
+		return "", nil
+	}
+
+	fmt.Println(data[0])
+
+	return "", nil
 }
 
 func createNew() {
@@ -59,10 +87,10 @@ func createNew() {
 
 func buildRefactoringFile(title string) {
 	_ = os.MkdirAll("docs", os.ModePerm)
-	_ = os.MkdirAll("docs/refactoring", os.ModePerm)
+	_ = os.MkdirAll(task_path, os.ModePerm)
 
 	fileName := utils.BuildFileName(utils.GenerateId(), title)
-	_ = ioutil.WriteFile("docs/refactoring/"+fileName, []byte("# " + title+"\n\n"+" - [ ] todo"), 0644)
+	_ = ioutil.WriteFile(task_path+"/"+fileName, []byte("# "+title+"\n\n"+" - [ ] todo"), 0644)
 }
 
 func validate() {
