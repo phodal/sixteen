@@ -3,17 +3,21 @@ package main
 import (
 	"bufio"
 	"errors"
+	"fmt"
+	"github.com/manifoldco/promptui"
 	"io/ioutil"
 	"log"
 	"os"
 	"sixteen/utils"
-	"strings"
-
-	//"sixteen/cmd"
-	"fmt"
-	"github.com/manifoldco/promptui"
 	"strconv"
+	"strings"
 )
+
+type TaskModel struct {
+	Id    string
+	Title string
+	Todos []string
+}
 
 func main() {
 	prompt := promptui.Select{
@@ -87,7 +91,7 @@ func ParseTask(filePath string) (string, error) {
 func getIdFromFileName(filePath string) string {
 	splitPath := strings.Split(filePath, "/")
 	taskName := splitPath[len(splitPath)-1]
-	id := taskName[0 : utils.ID_LENGTH]
+	id := taskName[0:utils.ID_LENGTH]
 	return id
 }
 
