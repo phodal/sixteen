@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"io/ioutil"
 	"log"
 	"os"
 	"sixteen/utils"
+	"strings"
 
 	//"sixteen/cmd"
 	"fmt"
@@ -32,10 +34,10 @@ func main() {
 		return
 	}
 
-	fmt.Println(result)
 	switch result {
 	case "list":
-		listTasks()
+		tasks := listTasks()
+		fmt.Println(tasks)
 	case "create":
 		createNew()
 	default:
@@ -60,15 +62,33 @@ func listTasks() []string {
 }
 
 func ParseTask(filePath string) (string, error) {
-	data, err := ioutil.ReadFile(filePath)
+	id := getIdFromFileName(filePath)
+	file, err := os.Open(filePath)
 
 	if err != nil {
-		return "", nil
+		log.Fatalf("failed opening file: %s", err)
 	}
 
-	fmt.Println(data[0])
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanLines)
+	var txtlines []string
 
-	return "", nil
+	for scanner.Scan() {
+		txtlines = append(txtlines, scanner.Text())
+	}
+
+	file.Close()
+
+	taskName := id + " " + strings.ReplaceAll(txtlines[0], "# ", "")
+
+	return taskName, nil
+}
+
+func getIdFromFileName(filePath string) string {
+	splitPath := strings.Split(filePath, "/")
+	taskName := splitPath[len(splitPath)-1]
+	id := taskName[0 : utils.ID_LENGTH]
+	return id
 }
 
 func createNew() {
