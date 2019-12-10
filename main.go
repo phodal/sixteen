@@ -44,28 +44,34 @@ func main() {
 		fmt.Println(tasks)
 	case "create":
 		createNew()
+	case "step":
+		listSteps()
 	default:
 		validate()
 	}
 }
 
+func listSteps() {
+
+}
+
 const task_path = "docs/refactoring/"
 
-func listTasks() []string {
+func listTasks() []TaskModel {
 	files, err := ioutil.ReadDir(task_path)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var tasks []string
+	var tasks []TaskModel
 	for _, f := range files {
 		task, _ := ParseTask(task_path + f.Name())
-		tasks = append(tasks, task)
+		tasks = append(tasks, *task)
 	}
 	return tasks
 }
 
-func ParseTask(filePath string) (string, error) {
+func ParseTask(filePath string) (*TaskModel, error) {
 	id := getIdFromFileName(filePath)
 	file, err := os.Open(filePath)
 
@@ -83,9 +89,13 @@ func ParseTask(filePath string) (string, error) {
 
 	file.Close()
 
-	taskName := id + " " + strings.ReplaceAll(txtlines[0], "# ", "")
+	task := &TaskModel{
+		Id:    id,
+		Title: strings.ReplaceAll(txtlines[0], "# ", ""),
+		Todos: nil,
+	}
 
-	return taskName, nil
+	return task, nil
 }
 
 func getIdFromFileName(filePath string) string {
