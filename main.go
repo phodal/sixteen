@@ -2,6 +2,10 @@ package main
 
 import (
 	"errors"
+	"io/ioutil"
+	"os"
+	"sixteen/utils"
+
 	//"sixteen/cmd"
 	"fmt"
 	"github.com/manifoldco/promptui"
@@ -31,10 +35,34 @@ func main() {
 	switch result {
 	case "list":
 		fmt.Println("list")
+	case "create":
+		createNew()
 	default:
 		//listLog
 		validate()
 	}
+}
+
+func createNew() {
+	prompt := promptui.Prompt{
+		Label: "title",
+	}
+
+	title, err := prompt.Run()
+	if err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return
+	}
+
+	buildRefactoringFile(title)
+}
+
+func buildRefactoringFile(title string) {
+	_ = os.MkdirAll("docs", os.ModePerm)
+	_ = os.MkdirAll("docs/refactoring", os.ModePerm)
+
+	fileName := utils.BuildFileName(utils.GenerateId(), title)
+	_ = ioutil.WriteFile("docs/refactoring/"+fileName, []byte("# " + title+"\n\n"+" - [ ] todo"), 0644)
 }
 
 func validate() {
