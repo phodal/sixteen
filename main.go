@@ -1,31 +1,16 @@
 package main
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"github.com/manifoldco/promptui"
 	"io/ioutil"
-	"log"
 	"os"
-	"regexp"
 	"sixteen/domain"
+	. "sixteen/domain"
 	"sixteen/utils"
 	"strconv"
-	"strings"
 )
-
-type TaskModel struct {
-	Id    string
-	Title string
-	Done  bool
-	Todos []TodoModel
-}
-
-type TodoModel struct {
-	Done    bool
-	Content string
-}
 
 func main() {
 	prompt := promptui.Select{
@@ -49,13 +34,15 @@ func main() {
 
 	switch result {
 	case "list":
-		tasks := listTasks()
+		tasks := domain.GetTasks()
 		fmt.Println(tasks)
 	case "create":
 		createNew()
 	case "step":
-		tasks := listTasks()
-		listSteps(tasks)
+		tasks := domain.GetTasks()
+		index := selectTask(tasks)
+		name := getStepName(tasks[index])
+		fmt.Println(name)
 	case "commit":
 		doCommit()
 	default:
@@ -78,7 +65,7 @@ func doCommit() {
 	utils.CommitByMessage("refactoring: " + result + "-" + utils.GenerateId())
 }
 
-func listSteps(tasks []TaskModel) {
+func selectTask(tasks []TaskModel) int {
 	templates := &promptui.SelectTemplates{
 		Label:    "{{ . }}?",
 		Active:   "\U0001F336 {{ .Id | cyan }}-{{ .Title | red }} {{ if eq .Done false }} ⌛ {{end}}",
@@ -96,13 +83,13 @@ func listSteps(tasks []TaskModel) {
 
 	if err != nil {
 		fmt.Printf("Prompt failed %v\n", err)
-		return
+		return 0
 	}
 
-	listStepTasks(tasks[i])
+	return i
 }
 
-func listStepTasks(model TaskModel) {
+func getStepName(model TaskModel) string {
 	templates := &promptui.SelectTemplates{
 		Label:    "{{ . }}?",
 		Active:   "\U0001F336 {{ .Content | red }} {{ if eq .Done true }} 👍 {{end}}",
@@ -120,67 +107,12 @@ func listStepTasks(model TaskModel) {
 
 	if err != nil {
 		fmt.Printf("Prompt failed %v\n", err)
-		return
+		return ""
 	}
 
-	fmt.Println(result)
+	return result
 }
 
-const TASK_PATH = "docs/refactoring/"
-
-func listTasks() []TaskModel {
-	files, err := ioutil.ReadDir(TASK_PATH)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var tasks []TaskModel
-	for _, f := range files {
-		task, _ := ParseTask(TASK_PATH + f.Name())
-		tasks = append(tasks, *task)
-	}
-	return tasks
-}
-
-func ParseTask(filePath string) (*TaskModel, error) {
-	id := domain.GetTaskIdFromFilePath(filePath)
-	file, err := os.Open(filePath)
-
-	if err != nil {
-		log.Fatalf("failed opening file: %s", err)
-	}
-
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanLines)
-	var txtlines []string
-
-	var todos []TodoModel
-	for scanner.Scan() {
-		txtlines = append(txtlines, scanner.Text())
-		var todoCompile = regexp.MustCompile(`\s-\s\[[ |x]\]\s(.*)`)
-
-		for _, match := range todoCompile.FindAllString(scanner.Text(), -1) {
-			content := todoCompile.ReplaceAllString(match, `$1`)
-			var hasDone = false
-			if strings.Contains(match, " - [x]") {
-				hasDone = true
-			}
-			todo := &TodoModel{Content: content, Done: hasDone}
-			todos = append(todos, *todo)
-		}
-	}
-
-	file.Close()
-
-	task := &TaskModel{
-		Id:    id,
-		Done:  false,
-		Title: strings.ReplaceAll(txtlines[0], "# ", ""),
-		Todos: todos,
-	}
-
-	return task, nil
-}
 
 func createNew() {
 	prompt := promptui.Prompt{
