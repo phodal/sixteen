@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"regexp"
 	"sixteen/utils"
 	"strconv"
 	"strings"
@@ -83,8 +84,17 @@ func ParseTask(filePath string) (*TaskModel, error) {
 	scanner.Split(bufio.ScanLines)
 	var txtlines []string
 
+	var todos []string
 	for scanner.Scan() {
 		txtlines = append(txtlines, scanner.Text())
+		var re = regexp.MustCompile(`\s-\s\[[ |x]\]\s(.*)`)
+
+		for _, match := range re.FindAllString(scanner.Text(), -1) {
+			//re.FindStringSubmatch(scanner.Text())
+			all := re.ReplaceAllString(match, `$1`)
+			fmt.Println(all)
+			todos = append(todos, all)
+		}
 	}
 
 	file.Close()
@@ -92,7 +102,7 @@ func ParseTask(filePath string) (*TaskModel, error) {
 	task := &TaskModel{
 		Id:    id,
 		Title: strings.ReplaceAll(txtlines[0], "# ", ""),
-		Todos: nil,
+		Todos: todos,
 	}
 
 	return task, nil
