@@ -18,6 +18,7 @@ import (
 type TaskModel struct {
 	Id    string
 	Title string
+	Done  bool
 	Todos []TodoModel
 }
 
@@ -59,8 +60,28 @@ func main() {
 	}
 }
 
-func listSteps([]TaskModel) {
+func listSteps(tasks []TaskModel) {
+	templates := &promptui.SelectTemplates{
+		Label:    "{{ . }}?",
+		Active:   "\U0001F336 {{ .Id | cyan }} - {{ .Title | red }}",
+		Inactive: "  {{ .Id | cyan }} - {{ .Title | red }}",
+		Selected: "\U0001F336 {{ .Id | red | cyan }}",
+	}
 
+	prompt := promptui.Select{
+		Label:     "Refactoring",
+		Templates: templates,
+		Items:     tasks,
+	}
+
+	_, result, err := prompt.Run()
+
+	if err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return
+	}
+
+	fmt.Println(result)
 }
 
 const TASK_PATH = "docs/refactoring/"
@@ -99,8 +120,8 @@ func ParseTask(filePath string) (*TaskModel, error) {
 		for _, match := range todoCompile.FindAllString(scanner.Text(), -1) {
 			content := todoCompile.ReplaceAllString(match, `$1`)
 			var hasDone = false
-			if (strings.Contains(match, " - [x]")) {
-				hasDone =true
+			if strings.Contains(match, " - [x]") {
+				hasDone = true
 			}
 			todo := &TodoModel{Content: content, Done: hasDone}
 			todos = append(todos, *todo)
@@ -111,6 +132,7 @@ func ParseTask(filePath string) (*TaskModel, error) {
 
 	task := &TaskModel{
 		Id:    id,
+		Done:  false,
 		Title: strings.ReplaceAll(txtlines[0], "# ", ""),
 		Todos: todos,
 	}
