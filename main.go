@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"github.com/manifoldco/promptui"
 	"io/ioutil"
@@ -9,7 +8,6 @@ import (
 	"sixteen/domain"
 	. "sixteen/domain"
 	"sixteen/utils"
-	"strconv"
 )
 
 func main() {
@@ -46,7 +44,7 @@ func main() {
 	case "commit":
 		doCommit()
 	default:
-		validate()
+		fmt.Printf("command %s not found----", result)
 	}
 }
 
@@ -62,7 +60,10 @@ func doCommit() {
 		return
 	}
 
-	utils.CommitByMessage("refactoring: " + result + "-" + utils.GenerateId())
+	tasks := domain.GetTasks()
+	task := tasks[selectTask(tasks)]
+
+	utils.CommitByMessage("refactoring: " + result + "-" + task.Id)
 }
 
 func selectTask(tasks []TaskModel) int {
@@ -134,28 +135,4 @@ func buildRefactoringFile(title string) {
 
 	fileName := utils.BuildFileName(utils.GenerateId(), title)
 	_ = ioutil.WriteFile(TASK_PATH+"/"+fileName, []byte("# "+title+"\n\n"+" - [ ] todo"), 0644)
-}
-
-func validate() {
-	validate := func(input string) error {
-		_, err := strconv.ParseFloat(input, 64)
-		if err != nil {
-			return errors.New("Invalid number")
-		}
-		return nil
-	}
-
-	prompt := promptui.Prompt{
-		Label:    "Number",
-		Validate: validate,
-	}
-
-	result, err := prompt.Run()
-
-	if err != nil {
-		fmt.Printf("Prompt failed %v\n", err)
-		return
-	}
-
-	fmt.Printf("You choose %q\n", result)
 }
