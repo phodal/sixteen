@@ -63,15 +63,39 @@ func main() {
 func listSteps(tasks []TaskModel) {
 	templates := &promptui.SelectTemplates{
 		Label:    "{{ . }}?",
-		Active:   "\U0001F336 {{ .Id | cyan }} - {{ .Title | red }} {{ if eq .Done false }} ⌛ {{end}}",
-		Inactive: "  {{ .Id | cyan }} - {{ .Title | red }} {{ if eq .Done false }} ⌛ {{end}}",
-		Selected: "\U0001F336 {{ .Id | red | cyan }} {{ if eq .Done false }} ⌛ {{end}}",
+		Active:   "\U0001F336 {{ .Id | cyan }}-{{ .Title | red }} {{ if eq .Done false }} ⌛ {{end}}",
+		Inactive: "  {{ .Id | cyan }}-{{ .Title | red }} {{ if eq .Done false }} ⌛ {{end}}",
+		Selected: "\U0001F336 {{ .Id | red | cyan }}-{{ if eq .Done false }} ⌛ {{end}}",
 	}
 
 	prompt := promptui.Select{
 		Label:     "Refactoring",
 		Templates: templates,
 		Items:     tasks,
+	}
+
+	i, _, err := prompt.Run()
+
+	if err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return
+	}
+
+	listStepTasks(tasks[i])
+}
+
+func listStepTasks(model TaskModel) {
+	templates := &promptui.SelectTemplates{
+		Label:    "{{ . }}?",
+		Active:   "\U0001F336 {{ .Content | red }} {{ if eq .Done true }} 👍 {{end}}",
+		Inactive: "  {{ .Content | red }} {{ if eq .Done true }} 👍 {{end}}",
+		Selected: "\U0001F336 {{ if eq .Done true }} 👍 {{end}}",
+	}
+
+	prompt := promptui.Select{
+		Label:     model.Title,
+		Templates: templates,
+		Items:     model.Todos,
 	}
 
 	_, result, err := prompt.Run()
