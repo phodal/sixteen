@@ -90,9 +90,7 @@ func ParseTask(filePath string) (*TaskModel, error) {
 		var re = regexp.MustCompile(`\s-\s\[[ |x]\]\s(.*)`)
 
 		for _, match := range re.FindAllString(scanner.Text(), -1) {
-			//re.FindStringSubmatch(scanner.Text())
 			all := re.ReplaceAllString(match, `$1`)
-			fmt.Println(all)
 			todos = append(todos, all)
 		}
 	}
