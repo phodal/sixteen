@@ -4,10 +4,15 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"github.com/gomarkdown/markdown"
+	"github.com/gomarkdown/markdown/ast"
+	"github.com/gomarkdown/markdown/html"
 	"github.com/manifoldco/promptui"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
+	"reflect"
 	"sixteen/utils"
 	"strconv"
 	"strings"
@@ -71,6 +76,23 @@ func listTasks() []TaskModel {
 	return tasks
 }
 
+func renderHookDropCodeBlock(w io.Writer, node ast.Node, entering bool) (ast.WalkStatus, bool) {
+	nodeType := reflect.TypeOf(node).String()
+	fmt.Println(nodeType)
+	switch nodeType {
+	case "*ast.Heading":
+		heading := node.(*ast.Heading)
+		fmt.Println(heading)
+		return ast.GoToNext, true
+	case "*ast.ListItem":
+		listItem := node.(*ast.ListItem)
+		fmt.Println(listItem.Content)
+		return ast.GoToNext, true
+	default:
+		return ast.GoToNext, false
+	}
+}
+
 func ParseTask(filePath string) (*TaskModel, error) {
 	id := getIdFromFileName(filePath)
 	file, err := os.Open(filePath)
@@ -86,6 +108,21 @@ func ParseTask(filePath string) (*TaskModel, error) {
 	for scanner.Scan() {
 		txtlines = append(txtlines, scanner.Text())
 	}
+
+	data, err := ioutil.ReadFile(filePath)
+
+	if err != nil {
+		return nil, nil
+	}
+
+	opts := html.RendererOptions{
+		Flags:          html.CommonFlags,
+		RenderNodeHook: renderHookDropCodeBlock,
+	}
+
+	renderer := html.NewRenderer(opts)
+	html := markdown.ToHTML(data, nil, renderer)
+	fmt.Println(string(html))
 
 	file.Close()
 

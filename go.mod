@@ -3,6 +3,7 @@ module sixteen
 go 1.13
 
 require (
+	github.com/gomarkdown/markdown v0.0.0-20191207194928-fbea82c4bb03 // indirect
 	github.com/manifoldco/promptui v0.6.0
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/spf13/cobra v0.0.5
