@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"sixteen/domain"
 	"sixteen/utils"
 	"strconv"
 	"strings"
@@ -17,7 +18,12 @@ import (
 type TaskModel struct {
 	Id    string
 	Title string
-	Todos []string
+	Todos []TodoModel
+}
+
+type TodoModel struct {
+	Done    bool
+	Content string
 }
 
 func main() {
@@ -46,34 +52,35 @@ func main() {
 	case "create":
 		createNew()
 	case "step":
-		listSteps()
+		tasks := listTasks()
+		listSteps(tasks)
 	default:
 		validate()
 	}
 }
 
-func listSteps() {
+func listSteps([]TaskModel) {
 
 }
 
-const task_path = "docs/refactoring/"
+const TASK_PATH = "docs/refactoring/"
 
 func listTasks() []TaskModel {
-	files, err := ioutil.ReadDir(task_path)
+	files, err := ioutil.ReadDir(TASK_PATH)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	var tasks []TaskModel
 	for _, f := range files {
-		task, _ := ParseTask(task_path + f.Name())
+		task, _ := ParseTask(TASK_PATH + f.Name())
 		tasks = append(tasks, *task)
 	}
 	return tasks
 }
 
 func ParseTask(filePath string) (*TaskModel, error) {
-	id := getIdFromFileName(filePath)
+	id := domain.GetTaskIdFromFilePath(filePath)
 	file, err := os.Open(filePath)
 
 	if err != nil {
@@ -84,14 +91,19 @@ func ParseTask(filePath string) (*TaskModel, error) {
 	scanner.Split(bufio.ScanLines)
 	var txtlines []string
 
-	var todos []string
+	var todos []TodoModel
 	for scanner.Scan() {
 		txtlines = append(txtlines, scanner.Text())
-		var re = regexp.MustCompile(`\s-\s\[[ |x]\]\s(.*)`)
+		var todoCompile = regexp.MustCompile(`\s-\s\[[ |x]\]\s(.*)`)
 
-		for _, match := range re.FindAllString(scanner.Text(), -1) {
-			all := re.ReplaceAllString(match, `$1`)
-			todos = append(todos, all)
+		for _, match := range todoCompile.FindAllString(scanner.Text(), -1) {
+			content := todoCompile.ReplaceAllString(match, `$1`)
+			var hasDone = false
+			if (strings.Contains(match, " - [x]")) {
+				hasDone =true
+			}
+			todo := &TodoModel{Content: content, Done: hasDone}
+			todos = append(todos, *todo)
 		}
 	}
 
@@ -104,13 +116,6 @@ func ParseTask(filePath string) (*TaskModel, error) {
 	}
 
 	return task, nil
-}
-
-func getIdFromFileName(filePath string) string {
-	splitPath := strings.Split(filePath, "/")
-	taskName := splitPath[len(splitPath)-1]
-	id := taskName[0:utils.ID_LENGTH]
-	return id
 }
 
 func createNew() {
@@ -129,10 +134,10 @@ func createNew() {
 
 func buildRefactoringFile(title string) {
 	_ = os.MkdirAll("docs", os.ModePerm)
-	_ = os.MkdirAll(task_path, os.ModePerm)
+	_ = os.MkdirAll(TASK_PATH, os.ModePerm)
 
 	fileName := utils.BuildFileName(utils.GenerateId(), title)
-	_ = ioutil.WriteFile(task_path+"/"+fileName, []byte("# "+title+"\n\n"+" - [ ] todo"), 0644)
+	_ = ioutil.WriteFile(TASK_PATH+"/"+fileName, []byte("# "+title+"\n\n"+" - [ ] todo"), 0644)
 }
 
 func validate() {
