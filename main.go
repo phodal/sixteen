@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"github.com/manifoldco/promptui"
+	"github.com/urfave/cli/v2"
 	"io/ioutil"
+	"log"
 	"os"
 	"sixteen/domain"
 	. "sixteen/domain"
@@ -11,6 +13,29 @@ import (
 )
 
 func main() {
+	app := &cli.App{
+		Action: func(c *cli.Context) error {
+			var command = c.Args().Get(0)
+			if command == "" {
+				res, done := runPrompt()
+				if done {
+					return nil
+				}
+				command = res
+			}
+
+			executeCommand(command)
+			return nil
+		},
+	}
+
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func runPrompt() (string, bool) {
 	prompt := promptui.Select{
 		Label: "Refactoring",
 		Items: []string{
@@ -27,10 +52,9 @@ func main() {
 
 	if err != nil {
 		fmt.Printf("Prompt failed %v\n", err)
-		return
+		return "", true
 	}
-
-	executeCommand(result)
+	return result, false
 }
 
 func executeCommand(result string) {
