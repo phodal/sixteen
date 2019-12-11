@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/manifoldco/promptui"
+	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing/object"
 	"io/ioutil"
 	"log"
 	"os"
@@ -13,6 +15,7 @@ import (
 	"sixteen/utils"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type TaskModel struct {
@@ -35,6 +38,7 @@ func main() {
 			"step",
 			"switch",
 			"delete",
+			"commit",
 			"create",
 		},
 	}
@@ -55,9 +59,37 @@ func main() {
 	case "step":
 		tasks := listTasks()
 		listSteps(tasks)
+	case "commit":
+		doCommit()
 	default:
 		validate()
 	}
+}
+
+func initGit() {
+	r, err := git.PlainOpen(".")
+	utils.CheckIfError(err)
+	w, err := r.Worktree()
+	utils.CheckIfError(err)
+
+	commit, err := w.Commit("example go-git commit", &git.CommitOptions{
+		Author: &object.Signature{
+			When:  time.Now(),
+		},
+	})
+
+	utils.CheckIfError(err)
+
+	// Prints the current HEAD to verify that all worked well.
+	utils.Info("git show -s")
+	obj, err := r.CommitObject(commit)
+	utils.CheckIfError(err)
+
+	fmt.Println(obj)
+}
+
+func doCommit() {
+	initGit()
 }
 
 func listSteps(tasks []TaskModel) {
