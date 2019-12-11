@@ -66,15 +66,15 @@ func main() {
 	}
 }
 
-func initGit() {
+func commitByMesssage(message string) {
 	r, err := git.PlainOpen(".")
 	utils.CheckIfError(err)
 	w, err := r.Worktree()
 	utils.CheckIfError(err)
 
-	commit, err := w.Commit("example go-git commit", &git.CommitOptions{
+	commit, err := w.Commit(message, &git.CommitOptions{
 		Author: &object.Signature{
-			When:  time.Now(),
+			When: time.Now(),
 		},
 	})
 
@@ -89,7 +89,18 @@ func initGit() {
 }
 
 func doCommit() {
-	initGit()
+	prompt := promptui.Prompt{
+		Label: "Commit Message",
+	}
+
+	result, err := prompt.Run()
+
+	if err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return
+	}
+
+	commitByMesssage("refactoring-" + result + "-" + utils.GenerateId())
 }
 
 func listSteps(tasks []TaskModel) {
