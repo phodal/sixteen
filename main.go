@@ -30,6 +30,10 @@ func main() {
 		return
 	}
 
+	executeCommand(result)
+}
+
+func executeCommand(result string) {
 	switch result {
 	case "list":
 		tasks := domain.GetTasks()
