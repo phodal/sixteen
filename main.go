@@ -75,7 +75,7 @@ func doCommit() {
 		return
 	}
 
-	utils.CommitByMessage("refactoring-" + result + "-" + utils.GenerateId())
+	utils.CommitByMessage("refactoring: " + result + "-" + utils.GenerateId())
 }
 
 func listSteps(tasks []TaskModel) {

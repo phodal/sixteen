@@ -14,5 +14,5 @@ require (
 	golang.org/x/sys v0.0.0-20191210023423-ac6580df4449 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/russross/blackfriday.v2 v2.0.0 // indirect
-	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
+	gopkg.in/src-d/go-git.v4 v4.13.1
 )
