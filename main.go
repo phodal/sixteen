@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/manifoldco/promptui"
-	"gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/plumbing/object"
 	"io/ioutil"
 	"log"
 	"os"
@@ -15,7 +13,6 @@ import (
 	"sixteen/utils"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type TaskModel struct {
@@ -66,28 +63,6 @@ func main() {
 	}
 }
 
-func commitByMesssage(message string) {
-	r, err := git.PlainOpen(".")
-	utils.CheckIfError(err)
-	w, err := r.Worktree()
-	utils.CheckIfError(err)
-
-	commit, err := w.Commit(message, &git.CommitOptions{
-		Author: &object.Signature{
-			When: time.Now(),
-		},
-	})
-
-	utils.CheckIfError(err)
-
-	// Prints the current HEAD to verify that all worked well.
-	utils.Info("git show -s")
-	obj, err := r.CommitObject(commit)
-	utils.CheckIfError(err)
-
-	fmt.Println(obj)
-}
-
 func doCommit() {
 	prompt := promptui.Prompt{
 		Label: "Commit Message",
@@ -100,7 +75,7 @@ func doCommit() {
 		return
 	}
 
-	commitByMesssage("refactoring-" + result + "-" + utils.GenerateId())
+	utils.CommitByMessage("refactoring-" + result + "-" + utils.GenerateId())
 }
 
 func listSteps(tasks []TaskModel) {
