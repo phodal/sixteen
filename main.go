@@ -63,9 +63,9 @@ func main() {
 func listSteps(tasks []TaskModel) {
 	templates := &promptui.SelectTemplates{
 		Label:    "{{ . }}?",
-		Active:   "\U0001F336 {{ .Id | cyan }} - {{ .Title | red }}",
-		Inactive: "  {{ .Id | cyan }} - {{ .Title | red }}",
-		Selected: "\U0001F336 {{ .Id | red | cyan }}",
+		Active:   "\U0001F336 {{ .Id | cyan }} - {{ .Title | red }} {{ if eq .Done false }} ⌛ {{end}}",
+		Inactive: "  {{ .Id | cyan }} - {{ .Title | red }} {{ if eq .Done false }} ⌛ {{end}}",
+		Selected: "\U0001F336 {{ .Id | red | cyan }} {{ if eq .Done false }} ⌛ {{end}}",
 	}
 
 	prompt := promptui.Select{
