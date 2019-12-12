@@ -8,13 +8,17 @@ import (
 	"strings"
 )
 
-
 type CommitMessage struct {
 	Rev     string
 	Author  string
 	Date    string
 	Message string
 	Changes []FileChange
+	Task    LogTaskModel
+}
+
+type LogTaskModel struct {
+	Id string
 }
 
 type FileChange struct {
@@ -27,7 +31,7 @@ var currentCommitMessage CommitMessage
 var currentFileChanges []FileChange
 var commitMessages []CommitMessage
 
-func BuildCommitMessage() []CommitMessage {
+func BuildCommitMessages() []CommitMessage {
 	historyArgs := []string{"log", "--pretty=format:[%h] %aN %ad %s", "--date=short", "--numstat"}
 	cmd := exec.Command("git", historyArgs...)
 	out, err := cmd.CombinedOutput()
@@ -35,14 +39,13 @@ func BuildCommitMessage() []CommitMessage {
 		log.Fatalf("cmd.Run() failed with %s\n", err)
 	}
 
-	splitStr := strings.Split(string(out), "\n");
+	splitStr := strings.Split(string(out), "\n")
 	for _, str := range splitStr {
 		parseLog(str)
 	}
 
 	return commitMessages
 }
-
 
 type TopAuthor struct {
 	Name        string
@@ -54,13 +57,16 @@ func parseLog(text string) {
 	rev := `\[([\d|a-f]{5,8})\]`
 	author := `(.*?)\s\d{4}-\d{2}-\d{2}`
 	date := `\d{4}-\d{2}-\d{2}`
-	// added <tab> deleted <tab> file <nl>
 	changes := `([\d-])*\t([\d-]*)\t(.*)`
 
 	revReg := regexp.MustCompile(rev)
 	authorReg := regexp.MustCompile(author)
 	dateReg := regexp.MustCompile(date)
 	changesReg := regexp.MustCompile(changes)
+
+	taskModel := &LogTaskModel{
+		Id: "",
+	}
 
 	allString := revReg.FindAllString(text, -1)
 	if len(allString) == 1 {
@@ -72,8 +78,13 @@ func parseLog(text string) {
 		str = strings.Split(str, auth[1])[1]
 		dat := dateReg.FindStringSubmatch(str)
 		msg := strings.Split(str, dat[0])[1]
+		msg = msg[1:]
 
-		currentCommitMessage = *&CommitMessage{id[1], auth[1], dat[0], msg, nil}
+		if strings.HasPrefix(msg, "refactoring:") && string(msg[len(msg) - ID_LENGTH - 1]) == "-" {
+			taskModel.Id = msg[len(msg) - ID_LENGTH:len(msg)]
+		}
+
+		currentCommitMessage = *&CommitMessage{id[1], auth[1], dat[0], msg, nil, *taskModel}
 	} else if changesReg.MatchString(text) {
 		changes := changesReg.FindStringSubmatch(text)
 		deleted, _ := strconv.Atoi(changes[2])
@@ -86,7 +97,7 @@ func parseLog(text string) {
 			currentCommitMessage.Changes = currentFileChanges
 			commitMessages = append(commitMessages, currentCommitMessage)
 
-			currentCommitMessage = *&CommitMessage{"", "", "", "", nil}
+			currentCommitMessage = *&CommitMessage{"", "", "", "", nil, *taskModel}
 			currentFileChanges = nil
 		}
 

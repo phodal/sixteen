@@ -71,8 +71,20 @@ func executeCommand(result string) {
 		fmt.Println(name)
 	case "commit":
 		doCommit()
+	case "show":
+		showChangeHistory()
 	default:
 		fmt.Printf("command %s not found----", result)
+	}
+}
+
+func showChangeHistory() {
+	//tasks := domain.GetTasks()
+	messages := utils.BuildCommitMessages()
+	for _, msg := range messages {
+		if msg.Task.Id != "" {
+			fmt.Println(msg.Task.Id)
+		}
 	}
 }
 
