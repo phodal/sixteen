@@ -1,6 +1,57 @@
 # Sixteen
 
 
+## Usage
+
+Install
+
+```
+go run main.go
+```
+
+examples
+
+```
+➜  sixteen git:(master) ✗ go run main.go     
+Use the arrow keys to navigate: ↓ ↑ → ← 
+? Refactoring: 
+  ▸ list
+    step
+    switch
+    delete
+↓   commit
+```
+
+ - commit: use refactoring commit
+ - create: create new refactoring task 
+ - step: show step of tasks
+ - show: show tasks info
+
+
+### Show Example
+
+```
+go run main.go show
+```
+
+results:
+
+```
+add blablbla blabla 
+  2019-12-12 13:16:09 refactoring: make date be long-3NJoo9aWR
+phodal-refactoring itfas
+  2019-12-11 20:28:28 refactoring: use cli api-4TPJClaZR
+blabla 
+  2019-12-11 20:32:15 refactoring: remove unused commit-ITolT9aWg
+a show case
+  2019-12-11 20:21:18 refactoring: remove unsued validate && add commit select tasks-cU6xor-Wg
+支持中文符号
+  2019-12-12 13:06:38 refactoring: add basic show foramt-iRych9aZg
+  2019-12-11 20:23:00 refactoring: extract command method-iRych9aZg
+```
+
+## Document
+
 Goals:
 
  - 旧的不变
