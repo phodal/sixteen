@@ -41,9 +41,10 @@ func runPrompt() (string, bool) {
 		Items: []string{
 			"list",
 			"step",
-			"switch",
-			"delete",
+			//"switch",
+			//"delete",
 			"commit",
+			"show",
 			"create",
 		},
 	}
