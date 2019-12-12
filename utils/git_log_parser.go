@@ -32,7 +32,7 @@ var currentFileChanges []FileChange
 var commitMessages []CommitMessage
 
 func BuildCommitMessages() []CommitMessage {
-	historyArgs := []string{"log", "--pretty=format:[%h] %aN %ad %s", "--date=short", "--numstat"}
+	historyArgs := []string{"log", "--pretty=format:[%h] %aN %ad %s", "--date=iso", "--numstat"}
 	cmd := exec.Command("git", historyArgs...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -56,7 +56,7 @@ type TopAuthor struct {
 func parseLog(text string) {
 	rev := `\[([\d|a-f]{5,8})\]`
 	author := `(.*?)\s\d{4}-\d{2}-\d{2}`
-	date := `\d{4}-\d{2}-\d{2}`
+	date := `\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\s\+\d{4}`
 	changes := `([\d-])*\t([\d-]*)\t(.*)`
 
 	revReg := regexp.MustCompile(rev)
@@ -84,7 +84,8 @@ func parseLog(text string) {
 			taskModel.Id = msg[len(msg) - ID_LENGTH:len(msg)]
 		}
 
-		currentCommitMessage = *&CommitMessage{id[1], auth[1], dat[0], msg, nil, *taskModel}
+		date := dat[0][0:len(dat[0])-5]
+		currentCommitMessage = *&CommitMessage{id[1], auth[1], date, msg, nil, *taskModel}
 	} else if changesReg.MatchString(text) {
 		changes := changesReg.FindStringSubmatch(text)
 		deleted, _ := strconv.Atoi(changes[2])
