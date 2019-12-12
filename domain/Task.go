@@ -92,3 +92,11 @@ func GetTasks() []TaskModel {
 	return tasks
 }
 
+func TaskToMap(tasks []TaskModel) map[string]TaskModel {
+	var maps = make(map[string]TaskModel)
+	for _, task := range tasks {
+		maps[task.Id] = task
+	}
+
+	return maps
+}

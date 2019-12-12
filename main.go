@@ -80,12 +80,17 @@ func executeCommand(result string) {
 
 func showChangeHistory() {
 	//tasks := domain.GetTasks()
+	//taskMap := domain.TaskToMap(tasks)
+
+	var historyMap = make(map[string][]utils.CommitMessage)
+
 	messages := utils.BuildCommitMessages()
 	for _, msg := range messages {
 		if msg.Task.Id != "" {
-			fmt.Println(msg.Task.Id)
+			historyMap[msg.Task.Id] = append(historyMap[msg.Task.Id], msg)
 		}
 	}
+	fmt.Println(historyMap)
 }
 
 func doCommit() {
