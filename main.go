@@ -79,7 +79,7 @@ func executeCommand(result string) {
 }
 
 func showChangeHistory() {
-	//tasks := domain.GetTasks()
+	tasks := domain.GetTasks()
 	//taskMap := domain.TaskToMap(tasks)
 
 	var historyMap = make(map[string][]utils.CommitMessage)
@@ -90,7 +90,13 @@ func showChangeHistory() {
 			historyMap[msg.Task.Id] = append(historyMap[msg.Task.Id], msg)
 		}
 	}
-	fmt.Println(historyMap)
+
+	for _, task := range tasks {
+		fmt.Println(task.Title)
+		for _, history := range historyMap[task.Id] {
+			fmt.Println("  " + history.Date + "-" + history.Message)
+		}
+	}
 }
 
 func doCommit() {
@@ -158,7 +164,6 @@ func getStepName(model TaskModel) string {
 
 	return result
 }
-
 
 func createNew() {
 	prompt := promptui.Prompt{
