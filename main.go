@@ -94,7 +94,7 @@ func showChangeHistory() {
 	for _, task := range tasks {
 		fmt.Println(task.Title)
 		for _, history := range historyMap[task.Id] {
-			fmt.Println("  " + history.Date + "-" + history.Message)
+			fmt.Println("  " + history.Date + "" + history.Message)
 		}
 	}
 }
@@ -120,9 +120,9 @@ func doCommit() {
 func selectTask(tasks []TaskModel) int {
 	templates := &promptui.SelectTemplates{
 		Label:    "{{ . }}?",
-		Active:   "\U0001F336 {{ .Id | cyan }}-{{ .Title | red }} {{ if eq .Done false }} ⌛ {{end}}",
-		Inactive: "  {{ .Id | cyan }}-{{ .Title | red }} {{ if eq .Done false }} ⌛ {{end}}",
-		Selected: "\U0001F336 {{ .Id | red | cyan }}-{{ if eq .Done false }} ⌛ {{end}}",
+		Active:   "\U0001F336 {{ .Id | cyan }}{{ .Title | red }} {{ if eq .Done false }} ⌛ {{end}}",
+		Inactive: "  {{ .Id | cyan }}{{ .Title | red }} {{ if eq .Done false }} ⌛ {{end}}",
+		Selected: "\U0001F336 {{ .Id | red | cyan }}{{ if eq .Done false }} ⌛ {{end}}",
 	}
 
 	prompt := promptui.Select{
