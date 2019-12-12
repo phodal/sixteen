@@ -102,7 +102,7 @@ func showChangeHistory() {
 
 		fmt.Println(doneStr + task.Title)
 		for _, history := range historyMap[task.Id] {
-			showItem := "    " + history.Date + "" + history.Message
+			showItem := "    "  + history.Date + " " + history.Rev + " " + history.Message
 			fmt.Println(showItem)
 		}
 	}

@@ -84,7 +84,7 @@ func parseLog(text string) {
 			taskModel.Id = msg[len(msg) - ID_LENGTH:len(msg)]
 		}
 
-		date := dat[0][0:len(dat[0])-5]
+		date := dat[0][0:len(dat[0])-6]
 		currentCommitMessage = *&CommitMessage{id[1], auth[1], date, msg, nil, *taskModel}
 	} else if changesReg.MatchString(text) {
 		changes := changesReg.FindStringSubmatch(text)
