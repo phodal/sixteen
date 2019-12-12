@@ -93,9 +93,17 @@ func showChangeHistory() {
 	}
 
 	for _, task := range tasks {
-		fmt.Println(task.Title)
+		var doneStr = " [x] "
+		for _, job := range task.Todos {
+			if job.Done == false {
+				doneStr = " [ ] "
+			}
+		}
+
+		fmt.Println(doneStr + task.Title)
 		for _, history := range historyMap[task.Id] {
-			fmt.Println("  " + history.Date + "" + history.Message)
+			showItem := "    " + history.Date + "" + history.Message
+			fmt.Println(showItem)
 		}
 	}
 }
