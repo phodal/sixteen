@@ -3,6 +3,11 @@
 
 ## Usage
 
+Usage Mode:
+
+ - Interactive Mode
+ - Cli Mode
+
 Install
 
 ```

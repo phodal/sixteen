@@ -6,7 +6,7 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/manifoldco/promptui v0.6.0
 	github.com/teris-io/shortid v0.0.0-20171029131806-771a37caa5cf
-	github.com/urfave/cli/v2 v2.0.0 // indirect
+	github.com/urfave/cli/v2 v2.0.0
 	golang.org/x/crypto v0.0.0-20191206172530-e9b2fee46413 // indirect
 	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553 // indirect
 	golang.org/x/sys v0.0.0-20191210023423-ac6580df4449 // indirect
