@@ -5,26 +5,26 @@
 
 Usage Mode:
 
- - Interactive Mode
- - Cli Mode
+ - Interactive Mode: `sixteen`
+ - Cli Mode: `sixteen [cmd]`, such as: `sixteen show`
 
 Install
 
 ```
-go run main.go
+sixteen
 ```
 
 examples
 
 ```
-➜  sixteen git:(master) ✗ go run main.go     
+➜  sixteen git:(master) ✗ sixteen     
 Use the arrow keys to navigate: ↓ ↑ → ← 
 ? Refactoring: 
   ▸ list
     step
-    switch
-    delete
-↓   commit
+    commit
+    show
+    create
 ```
 
  - commit: use refactoring commit
@@ -36,7 +36,7 @@ Use the arrow keys to navigate: ↓ ↑ → ←
 ### Show Example
 
 ```
-go run main.go show
+sixteen show
 ```
 
 results:
